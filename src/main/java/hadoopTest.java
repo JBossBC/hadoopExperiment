@@ -22,9 +22,12 @@ public class hadoopTest {
      static Configuration config = new Configuration();
 
     public static void main(String[] args) throws  Exception {
-
-//        uploadFileByJavaAPI();
-//        downLoadFileByJavaAPI();
+        if (args.length<=0){
+            System.out.println("the input params cant less than zero");
+            System.exit(-1);
+        }
+//        uploadFileByJavaAPI(args);
+        downLoadFileByJavaAPI(args);
 //        System.exit(-1);
 //        config.set("mapreduce.input.fileinputformat.inputdir","/input");
 //        config.set("mapreduce.output.fileoutputformat.outputdir","/output");
@@ -33,46 +36,46 @@ public class hadoopTest {
 //        fileSystem.copyFromLocalFile(new Path("./实验3第一题数据.txt"),new Path("/input/实验3第一题数据.txt"));
 //        fileSystem.mkdirs(new Path("/output"));
 //        fileSystem.close();
-        System.out.println("Starting the one job");
-        mapreduceTest(args);
-        System.out.println("Ending the one job");
-        System.out.println("Starting the two job");
-        sortResultFromOne(args);
-        System.out.println("Ending the Two job");
-        System.out.println("Starting the three job");
-        timePartition(args);
-        System.out.println("Ending the three job");
+//        System.out.println("Starting the one job");
+//        mapreduceTest(args);
+//        System.out.println("Ending the one job");
+//        System.out.println("Starting the two job");
+//        sortResultFromOne(args);
+//        System.out.println("Ending the Two job");
+//        System.out.println("Starting the three job");
+//        timePartition(args);
+//        System.out.println("Ending the three job");
 
     }
-//    public static void downLoadFileByJavaAPI() throws URISyntaxException, IOException, InterruptedException {
-//        Configuration conf = new Configuration();
-//        FileSystem fs = FileSystem.get(new URI("hdfs://master:9000"), conf, "root");
-//        if(!fs.exists(new Path("/experimentTwo/shellCommandData"))){
-//            System.out.println("/experimentTwo/shellCommandData not exist ,program exit");
-//            System.exit(-1);
-//        }
-//        System.out.println("download the /experimentTwo/shellCommandData to current repository shellCommandData.txt file");
-//        fs.copyToLocalFile(new Path("/experimentTwo/shellCommandData"),new Path("./shellCommandData.txt"));
-//        System.out.println("Completing the download the file");
-//        fs.close();
-//    }
-//    public static void uploadFileByJavaAPI() throws URISyntaxException, IOException, InterruptedException {
-//        Configuration conf = new Configuration();
-//        FileSystem fs = FileSystem.get(new URI("hdfs://master:9000"), conf, "root");
-//        if(!fs.exists(new Path("/experimentTwo"))){
-//            System.out.println("Cant exist the experimentTwo repository,Creating Now.....");
-//            fs.mkdirs(new Path("/experimentTwo"));
-//        }
-//        if(fs.exists(new Path("/experimentTwo/shellCommandData"))){
-//            System.out.println("delete origin shellCommandData file");
-//            fs.delete(new Path("/experimentTwo/shellCommandData"),true);
-//        }
-//        System.out.println("Starting copy the ./实验3第一题数据.txt to /experimentTwo/shellCommandData");
-//        fs.copyFromLocalFile(new Path("./实验3第一题数据.txt"),new Path("/experimentTwo/shellCommandData"));
-//        System.out.println("Completing the upload the file");
-//
-//        fs.close();
-//    }
+    public static void downLoadFileByJavaAPI(String[]args) throws URISyntaxException, IOException, InterruptedException {
+        Configuration conf = new Configuration();
+        FileSystem fs = FileSystem.get(new URI("hdfs://master:9000"), conf, "root");
+        if(!fs.exists(new Path(String.format("/Xiyang/%s",args[0])))){
+            System.out.println(String.format("/Xiyang/%s not exist ,program exit\n",args[0]));
+            System.exit(-1);
+        }
+        System.out.println(String.format("download the  /Xiyang/%s to current repository %s file\n",args[0],args[0]));
+        fs.copyToLocalFile(new Path(String.format("/Xiyang/%s",args[0])),new Path(String.format("./%s",args[0])));
+        System.out.println("Completing the download the file\n");
+        fs.close();
+    }
+    public static void uploadFileByJavaAPI(String[] args) throws URISyntaxException, IOException, InterruptedException {
+        Configuration conf = new Configuration();
+        FileSystem fs = FileSystem.get(new URI("hdfs://master:9000"), conf, "root");
+        if(!fs.exists(new Path("/Xiyang"))){
+            System.out.println("Cant exist the Xiyang repository,Creating Now.....");
+            fs.mkdirs(new Path("/Xiyang"));
+        }
+        if(fs.exists(new Path(String.format("/Xiyang/%s",args[0])))){
+            System.out.println(String.format("delete the origin %s file\n",args[0]));
+            fs.delete(new Path(String.format("/Xiyang/%s",args[0])),true);
+        }
+        System.out.printf("Starting copy the %s to /Xiyang/%s\n",args[0],args[0]);
+        fs.copyFromLocalFile(new Path(String.format("./%s",args[0])),new Path(String.format("/Xiyang/%s",args[0])));
+        System.out.println("Completing the upload the file\n");
+
+        fs.close();
+    }
     public static void mapreduceTest(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration conf = new Configuration();
         conf.set("mapreduce.input.fileinputformat.inputdir","/input");

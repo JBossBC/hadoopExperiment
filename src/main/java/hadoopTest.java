@@ -17,6 +17,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 
 public class hadoopTest {
      static Configuration config = new Configuration();
@@ -27,7 +28,7 @@ public class hadoopTest {
             System.exit(-1);
         }
 //        uploadFileByJavaAPI(args);
-        downLoadFileByJavaAPI(args);
+//        downLoadFileByJavaAPI(args);
 //        System.exit(-1);
 //        config.set("mapreduce.input.fileinputformat.inputdir","/input");
 //        config.set("mapreduce.output.fileoutputformat.outputdir","/output");
@@ -45,7 +46,39 @@ public class hadoopTest {
 //        System.out.println("Starting the three job");
 //        timePartition(args);
 //        System.out.println("Ending the three job");
+        System.out.println("Starting the compute average value job");
+        averageValue(args);
+        System.out.println("Ending the compute average value job");
 
+
+    }
+//    public static void searchFiles() throws URISyntaxException, IOException, InterruptedException {
+//        Configuration conf = new Configuration();
+//        FileSystem fs = FileSystem.get(new URI("hdfs://master:9000"), conf, "root");
+//        fs.listFiles("true)
+//    }
+
+    /**
+     * need to convey the InputFile path and OutputFile path,
+     * @param args
+     * @throws IOException
+     */
+    public static void statisticPublicNumber(String[]args) throws IOException, InterruptedException, ClassNotFoundException {
+        Configuration conf = new Configuration();
+        Job instanceJob = Job.getInstance(conf);
+        instanceJob.setJarByClass(hadoopTest.class);
+        instanceJob.setNumReduceTasks(3);
+        instanceJob.setMapperClass(five.statisticsPublicNumberMapper.class);
+        instanceJob.setMapOutputKeyClass(Text.class);
+        instanceJob.setMapOutputValueClass(Text.class);
+        // 6 设置输入路径和输出路径
+        FileInputFormat.setInputPaths(new JobConf(conf),new Path(args[0]));
+        FileOutputFormat.setOutputPath(new JobConf(conf),new Path(args[1]));
+        boolean b = instanceJob.waitForCompletion(true);
+        if(!b){
+            System.out.println("The statisticPublicNumber program failed,please connected the author");
+            System.exit(-1);
+        }
     }
     public static void downLoadFileByJavaAPI(String[]args) throws URISyntaxException, IOException, InterruptedException {
         Configuration conf = new Configuration();
@@ -78,6 +111,7 @@ public class hadoopTest {
     }
     public static void mapreduceTest(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration conf = new Configuration();
+        conf.addResource(new URL("hdfs://master:9000"));
         conf.set("mapreduce.input.fileinputformat.inputdir","/input");
         conf.set("mapreduce.output.fileoutputformat.outputdir","/output");
 
@@ -113,6 +147,7 @@ public class hadoopTest {
 
     public static void sortResultFromOne(String[]args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration conf = new Configuration();
+        conf.addResource(new URL("hdfs://master:9000"));
         conf.set("mapreduce.input.fileinputformat.inputdir","/output");
         conf.set("mapreduce.output.fileoutputformat.outputdir","/output2");
         Job job = Job.getInstance(conf);
@@ -140,8 +175,37 @@ public class hadoopTest {
             System.exit(-1);
         }
     }
+    /**
+     * need to convey the InputFile path and OutputFile path,
+     * @param args
+     * @throws IOException
+     */
+    public static void averageValue(String[]args) throws IOException, InterruptedException, ClassNotFoundException {
+        Configuration conf = new Configuration();
+//        conf.addResource(new URL("hdfs://master:9000"));
+        conf.set("mapreduce.input.fileinputformat.inputdir","/input");
+        conf.set("mapreduce.input.fileoutputformat.outputdir","/outputAverageValue");
+        Job instance = Job.getInstance(conf);
+        instance.setJarByClass(hadoopTest.class);
+        instance.setNumReduceTasks(3);
+        instance.setMapperClass(four.averageGradeMapper.class);
+        instance.setReducerClass(four.averageGradeReduce.class);
+        instance.setMapOutputKeyClass(Text.class);
+        instance.setMapOutputValueClass(IntWritable.class);
+        instance.setOutputKeyClass(Text.class);
+        instance.setOutputValueClass(IntWritable.class);
+        FileInputFormat.setInputPaths(new JobConf(conf),new Path(args[0]));
+        FileOutputFormat.setOutputPath(new JobConf(conf),new Path(args[1]));
+        boolean b = instance.waitForCompletion(true);
+        if(!b){
+            System.out.println("the averageValue program error");
+            System.exit(-1);
+        }
+
+    }
     public static void timePartition(String[]args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration conf = new Configuration();
+        conf.addResource(new URL("hdfs://master:9000"));
         conf.set("mapreduce.input.fileinputformat.inputdir","/output");
         conf.set("mapreduce.output.fileoutputformat.outputdir","/output3");
         Job job = Job.getInstance(conf);

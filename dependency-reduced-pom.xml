@@ -23,7 +23,7 @@
           </descriptorRefs>
           <archive>
             <manifest>
-              <mainClass>hadoopTest</mainClass>
+              <mainClass>finalExperiment.TrainingMachineMain</mainClass>
             </manifest>
           </archive>
         </configuration>

@@ -37,21 +37,21 @@ public class hadoopTest {
 //        fileSystem.copyFromLocalFile(new Path("./实验3第一题数据.txt"),new Path("/input/实验3第一题数据.txt"));
 //        fileSystem.mkdirs(new Path("/output"));
 //        fileSystem.close();
-//        System.out.println("Starting the one job");
-//        mapreduceTest(args);
-//        System.out.println("Ending the one job");
-//        System.out.println("Starting the two job");
-//        sortResultFromOne(args);
-//        System.out.println("Ending the Two job");
-//        System.out.println("Starting the three job");
-//        timePartition(args);
-//        System.out.println("Ending the three job");
+        System.out.println("Starting the one job");
+        mapreduceTest(args);
+        System.out.println("Ending the one job");
+        System.out.println("Starting the two job");
+        sortResultFromOne(args);
+        System.out.println("Ending the Two job");
+        System.out.println("Starting the three job");
+        timePartition(args);
+        System.out.println("Ending the three job");
 //        System.out.println("Starting the compute average value job");
 //        averageValue(args);
 //        System.out.println("Ending the compute average value job");
-        System.out.println("Starting the statisticPublicNumber job");
-        statisticPublicNumber(args);
-        System.out.println("Ending the statisticPublicNumber job");
+//        System.out.println("Starting the statisticPublicNumber job");
+//        statisticPublicNumber(args);
+//        System.out.println("Ending the statisticPublicNumber job");
 
 
     }
@@ -151,7 +151,6 @@ public class hadoopTest {
     }
     public static void mapreduceTest(String[] args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration conf = new Configuration();
-        conf.addResource(new URL("hdfs://master:9000"));
         conf.set("mapreduce.input.fileinputformat.inputdir",args[0]);
         conf.set("mapreduce.output.fileoutputformat.outputdir",args[1]);
 
@@ -187,7 +186,6 @@ public class hadoopTest {
 
     public static void sortResultFromOne(String[]args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration conf = new Configuration();
-        conf.addResource(new URL("hdfs://master:9000"));
         conf.set("mapreduce.input.fileinputformat.inputdir",args[1]);
         conf.set("mapreduce.output.fileoutputformat.outputdir",args[2]);
         Job job = Job.getInstance(conf);
@@ -218,7 +216,6 @@ public class hadoopTest {
 
     public static void timePartition(String[]args) throws IOException, InterruptedException, ClassNotFoundException {
         Configuration conf = new Configuration();
-        conf.addResource(new URL("hdfs://master:9000"));
         conf.set("mapreduce.input.fileinputformat.inputdir",args[1]);
         conf.set("mapreduce.output.fileoutputformat.outputdir",args[3]);
         Job job = Job.getInstance(conf);
@@ -232,7 +229,6 @@ public class hadoopTest {
         // 5 设置最终输出的kV类型
         job.setMapOutputKeyClass(IntWritable.class);
         job.setMapOutputValueClass(Text.class);
-
         // 5 设置最终输出的kV类型
         job.setOutputKeyClass(IntWritable.class);
         job.setOutputValueClass(Text.class);

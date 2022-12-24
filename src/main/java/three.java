@@ -10,9 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class three {
+    //shuffle
     public static class timePartitioner extends Partitioner<IntWritable, Text> {
-
-
         @Override
         public int getPartition(IntWritable intWritable, Text text, int i) {
             System.out.println("text"+text.toString());
@@ -38,12 +37,12 @@ public class three {
             context.write( new IntWritable(Integer.parseInt(split[0])), new Text(split[1]));
         }
     }
-    public static class customCompactor extends WritableComparator {
-        @Override
-        public int compare(WritableComparable a, WritableComparable b) {
-            int i = Integer.parseInt(a.toString());
-            int j=Integer.parseInt(b.toString());
-            return i-j;
-        }
-    }
+//    public static class customCompactor extends WritableComparator {
+//        @Override
+//        public int compare(WritableComparable a, WritableComparable b) {
+//            int i = Integer.parseInt(a.toString());
+//            int j=Integer.parseInt(b.toString());
+//            return i-j;
+//        }
+//    }
 }

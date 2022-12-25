@@ -74,6 +74,7 @@ public class TrainingMachineMain{
         }catch(Exception e){
             System.out.println("finalize resource error:"+e.toString());
         }finally {
+            //mush release the hdfs client
             hadoopFS.close();
         }
     }
@@ -138,6 +139,7 @@ public class TrainingMachineMain{
         //limit the result element size should less than 1000
         AnalysisDataJob.AnalysisDataMapper.originMachineResult= originMachineResult;
         System.out.println("pre-handler the data from machine learning successfully");
+        //release stream resource
         bf.close();
         open.close();
     }

@@ -36,34 +36,46 @@ public class TrainingMachineMain{
      * @throws URISyntaxException
      * @throws IOException
      */
-    public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException {
         if(args.length!=2){
             System.out.println("you must input the params(trainingData location and testData location in hdfs filesystem )");
             System.exit(1);
         }
-        // init hadoop client
-           initHadoopFS();
-          trainingMachineFile=new Path(args[0]);
-          testDataFile=new Path(args[1]);
-          //model training
-        theMachineLeaningJob();
-        //pre-handler the machine learning data
-        handlerTheMachineData();
-        //Starting the test data analysis
-        testDataAnalysisJob();
-        //analysis the percent of accuracy
-        System.out.println("测试数据的准确度为"+((double)AnalysisDataJob.AnalysisDataMapper.matchNumber/AnalysisDataJob.AnalysisDataMapper.sumNumber));
-        System.out.println("---------------------------------------------结果文件存放在HDFS文件系统"+resultFile.toString()+"目录的part-r-00000文件中------------------------------");
-        System.out.println("Starting the finalizer resource");
-        finalizerTempData();
-        System.out.println("finalize resource successfully");
+        try {
+            // init hadoop client
+            initHadoopFS();
+            trainingMachineFile = new Path(args[0]);
+            testDataFile = new Path(args[1]);
+            //model training
+            theMachineLeaningJob();
+            //pre-handler the machine learning data
+            handlerTheMachineData();
+            //Starting the test data analysis
+            testDataAnalysisJob();
+            //analysis the percent of accuracy
+            System.out.println("测试数据的准确度为" + ((double) AnalysisDataJob.AnalysisDataMapper.matchNumber / AnalysisDataJob.AnalysisDataMapper.sumNumber));
+            System.out.println("---------------------------------------------Info:结果文件存放在HDFS文件系统" + resultFile.toString() + "目录的part-r-00000文件中------------------------------");
+        }catch(Exception e){
+            System.out.println(e.toString());
+        }finally {
+            System.out.println("Starting the finalizer resource");
+            finalizerTempData();
+            System.out.println("finalize resource successfully");
+        }
     }
 
     private static void finalizerTempData() throws IOException {
-        System.out.println("Deleting the tempTrainingResultFile");
-        hadoopFS.delete(tempTrainingResultFile,true);
-        System.out.println("Delete the tempTrainingResultFile successfully");
-        hadoopFS.close();
+        try {
+            System.out.println("Deleting the tempTrainingResultFile");
+            if (hadoopFS.exists(tempTrainingResultFile)) {
+                hadoopFS.delete(tempTrainingResultFile, true);
+            }
+            System.out.println("Delete the tempTrainingResultFile successfully");
+        }catch(Exception e){
+            System.out.println("finalize resource error:"+e.toString());
+        }finally {
+            hadoopFS.close();
+        }
     }
 
     /**

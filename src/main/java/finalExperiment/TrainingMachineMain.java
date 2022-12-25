@@ -24,7 +24,6 @@ public class TrainingMachineMain{
     static  Path testDataFile;
   static Configuration conf;
   static FileSystem hadoopFS;
-  static Path tempResultFile=new Path("/tempResultFile");
   //训练数据的暂存文件
   static Path tempTrainingResultFile=new Path("/tempMachineLearning");
   static Map<String,Integer> originMachineResult;
@@ -39,7 +38,7 @@ public class TrainingMachineMain{
      */
     public static void main(String[] args) throws URISyntaxException, IOException, InterruptedException, ClassNotFoundException {
         if(args.length!=2){
-            System.out.println("you must input the params(trainingData location and testData location )");
+            System.out.println("you must input the params(trainingData location and testData location in hdfs filesystem )");
             System.exit(1);
         }
         // init hadoop client
@@ -54,12 +53,16 @@ public class TrainingMachineMain{
         testDataAnalysisJob();
         //analysis the percent of accuracy
         System.out.println("测试数据的准确度为"+((double)AnalysisDataJob.AnalysisDataMapper.matchNumber/AnalysisDataJob.AnalysisDataMapper.sumNumber));
+        System.out.println("Starting the finalizer resource");
         finalizerTempData();
+        System.out.println("finalize resource successfully");
     }
 
     private static void finalizerTempData() throws IOException {
-        hadoopFS.delete(tempResultFile,true);
+        System.out.println("Deleting the tempTrainingResultFile");
         hadoopFS.delete(tempTrainingResultFile,true);
+        System.out.println("Delete the tempTrainingResultFile successfully");
+        hadoopFS.close();
     }
 
     /**
@@ -69,32 +72,17 @@ public class TrainingMachineMain{
         testDataAnalysisJobBefore();
         //analysis data
         conf.set("mapreduce.input.fileinputformat.inputdir",testDataFile.toString());
-        conf.set("mapreduce.output.fileoutputformat.outputdir",tempResultFile.toString());
+        conf.set("mapreduce.output.fileoutputformat.outputdir",resultFile.toString());
         Job instance = Job.getInstance(conf);
         instance.setJarByClass(TrainingMachineMain.class);
         instance.setMapperClass(AnalysisDataJob.AnalysisDataMapper.class);
         instance.setMapOutputValueClass(Text.class);
-        instance.setMapOutputKeyClass(Text.class);
-        instance.setOutputKeyClass(Text.class);
+        instance.setMapOutputKeyClass(IntWritable.class);
+        instance.setOutputKeyClass(IntWritable.class);
         instance.setOutputValueClass(Text.class);
         boolean result = instance.waitForCompletion(true);
         if(!result){
             System.out.println("testData analysis error");
-            System.exit(1);
-        }
-        //format file
-        conf.set("mapreduce.input.fileinputformat.inputdir",tempResultFile.toString());
-        conf.set("mapreduce.output.fileoutputformat.outputdir",resultFile.toString());
-        Job  formatJob = Job.getInstance(conf);
-        formatJob.setJarByClass(TrainingMachineMain.class);
-        formatJob.setMapperClass(AnalysisDataJob.sortResultMapper.class);
-        formatJob.setMapOutputValueClass(Text.class);
-        formatJob.setMapOutputKeyClass(Text.class);
-        formatJob.setOutputKeyClass(Text.class);
-        formatJob.setOutputValueClass(Text.class);
-        boolean  eventuallyResult = formatJob.waitForCompletion(true);
-        if(!eventuallyResult){
-            System.out.println("format resultFile error");
             System.exit(1);
         }
         System.out.println("testData execute successfully");
@@ -105,9 +93,8 @@ public class TrainingMachineMain{
      * @throws IOException
      */
     public static void testDataAnalysisJobBefore() throws IOException {
-        if(hadoopFS.exists(tempResultFile)){
-            hadoopFS.delete(tempResultFile,true);
-        }
+
+     System.out.println("Deleting the resultFile if it exist");
       if(hadoopFS.exists(resultFile)){
           hadoopFS.delete(resultFile,true);
       }
@@ -146,6 +133,7 @@ public class TrainingMachineMain{
      * 删除存在的临时文件
      */
     public static void HooksBeforeMachineLeaning() throws IOException {
+        System.out.println("Deleting the tempTrainingResultFile if it exist");
        if(hadoopFS.exists(tempTrainingResultFile)){
             hadoopFS.delete(tempTrainingResultFile,true);
        }

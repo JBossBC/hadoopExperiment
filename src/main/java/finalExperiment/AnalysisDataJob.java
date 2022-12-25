@@ -1,6 +1,7 @@
 package finalExperiment;
 
 
+import org.apache.hadoop.io.BinaryComparable;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -15,27 +16,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AnalysisDataJob {
-    public static class AnalysisDataMapper extends Mapper<Object, Text,Text, Text>{
-        @Override
-        protected void setup(Mapper<Object, Text, Text, Text>.Context context) throws IOException, InterruptedException {
-//            Map<String, Integer> machineResult = TrainingMachineMain.origiMachineResult;
-//            machineResult.forEach((key,values)->{
-//                try {
-//                    context.write(new Text(key),new Text(Integer.toString(values)));
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            });
-        }
+    public static class AnalysisDataMapper extends Mapper<Object, Text,IntWritable, Text>{
          public static String [] rootResult;
         static int currentNumber=1;
         static Map<String,Integer> originMachineResult;
         static int sumNumber;
         static int matchNumber;
         @Override
-        protected void map(Object key, Text value, Mapper<Object, Text, Text, Text>.Context context) throws IOException, InterruptedException {
+        protected void map(Object key, Text value, Mapper<Object, Text, IntWritable, Text>.Context context) throws IOException, InterruptedException {
             sumNumber++;
             String line = value.toString();
             String[] split = line.split(":");
@@ -46,7 +34,6 @@ public class AnalysisDataJob {
                     System.out.println(value+"split error,skipping the line");
                     return;
                 }
-
             String currentResult=split[0];
             String [] inputFeatures=split[1].split("\\u0020");
             String maxResult="default";
@@ -73,18 +60,19 @@ public class AnalysisDataJob {
                     maxResult=currentMaybe;
                 }
             }
-            context.write(new Text(Integer.toString(currentNumber)),new Text(maxResult));
+            context.write(new IntWritable(currentNumber),new Text(maxResult));
             if(currentResult.compareTo(maxResult)==0){
                 matchNumber++;
             }
             currentNumber++;
         }
     }
-   public static class sortResultMapper extends Mapper<Object,Text,Text,Text>{
+   public static class sortResultMapper extends Mapper<Object,Text,IntWritable,Text>{
        @Override
-       protected void map(Object key, Text value, Mapper<Object, Text, Text, Text>.Context context) throws IOException, InterruptedException {
+       protected void map(Object key, Text value, Mapper<Object, Text, IntWritable, Text>.Context context) throws IOException, InterruptedException {
            String[] split = value.toString().split("\t");
-           context.write(new Text(split[0]),new Text(split[1]));
+           context.write(new IntWritable(Integer.parseInt(split[0])),new Text(split[1]));
        }
    }
+
 }

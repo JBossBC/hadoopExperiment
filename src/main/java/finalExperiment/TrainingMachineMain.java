@@ -53,6 +53,7 @@ public class TrainingMachineMain{
         testDataAnalysisJob();
         //analysis the percent of accuracy
         System.out.println("测试数据的准确度为"+((double)AnalysisDataJob.AnalysisDataMapper.matchNumber/AnalysisDataJob.AnalysisDataMapper.sumNumber));
+        System.out.println("---------------------------------------------结果文件存放在HDFS文件系统"+resultFile.toString()+"目录的part-r-00000文件中------------------------------");
         System.out.println("Starting the finalizer resource");
         finalizerTempData();
         System.out.println("finalize resource successfully");
@@ -93,7 +94,6 @@ public class TrainingMachineMain{
      * @throws IOException
      */
     public static void testDataAnalysisJobBefore() throws IOException {
-
      System.out.println("Deleting the resultFile if it exist");
       if(hadoopFS.exists(resultFile)){
           hadoopFS.delete(resultFile,true);

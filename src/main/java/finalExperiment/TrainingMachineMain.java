@@ -138,7 +138,8 @@ public class TrainingMachineMain{
         //limit the result element size should less than 1000
         AnalysisDataJob.AnalysisDataMapper.originMachineResult= originMachineResult;
         System.out.println("pre-handler the data from machine learning successfully");
-
+        bf.close();
+        open.close();
     }
 
     /**
@@ -166,7 +167,6 @@ public class TrainingMachineMain{
         instanceJob.setOutputValueClass(IntWritable.class);
         System.out.println("Starting  the Model training,please wait");
         boolean result = instanceJob.waitForCompletion(true);
-
         if(!result){
             System.out.println("MachineLearning error");
             System.exit(1);
